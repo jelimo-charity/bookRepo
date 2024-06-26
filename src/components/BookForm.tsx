@@ -1,7 +1,11 @@
 import { useRef, FormEvent } from 'react';
 import { Book } from '../utils/Types';
+interface BookFormProps {
+  onSubmit: (book: Book) => void;
+  book?: Book | null;
+}
 
-const BookForm = ({ onSubmit, book }) => {
+const BookForm: React.FC<BookFormProps> =({ onSubmit, book }) => {
   const titleRef = useRef<HTMLInputElement>(null);
   const authorRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
