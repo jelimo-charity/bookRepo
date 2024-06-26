@@ -43,7 +43,7 @@ const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
         placeholder="Search by title"
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-4"
+        className="w-full p-2 border border-gray-300 rounded mb-4 mt-16"
       />
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
