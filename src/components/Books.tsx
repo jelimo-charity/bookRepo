@@ -1,5 +1,5 @@
 // src/components/Books.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Book } from '../utils/Types';
 
 interface BooksProps {
@@ -10,24 +10,41 @@ interface BooksProps {
 
 const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
   const booksPerPage = 5;
+
+  useEffect(() => {
+    const results = books.filter(book =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredBooks(results);
+    setCurrentPage(1);
+  }, [searchTerm, books]);
 
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
 
-  const totalPages = Math.ceil(books.length / booksPerPage);
+  const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
 
   const handleNextPage = useCallback(() => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+    setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages));
   }, [totalPages]);
 
   const handlePreviousPage = useCallback(() => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+    setCurrentPage(prevPage => Math.max(prevPage - 1, 1));
   }, []);
 
   return (
     <div>
+      <input
+        type="text"
+        placeholder="Search by title"
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded mb-4"
+      />
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
@@ -38,20 +55,20 @@ const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {currentBooks.map((book) => (
+          {currentBooks.map(book => (
             <tr key={book.id}>
               <td className="px-6 py-4 whitespace-nowrap">{book.title}</td>
               <td className="px-6 py-4 whitespace-nowrap">{book.author}</td>
               <td className="px-6 py-4 whitespace-nowrap">{book.year}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <button 
-                  onClick={() => onEdit(book)} 
+                <button
+                  onClick={() => onEdit(book)}
                   className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
                 >
                   Edit
                 </button>
-                <button 
-                  onClick={() => onDelete(book.id)} 
+                <button
+                  onClick={() => onDelete(book.id)}
                   className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Delete
@@ -62,17 +79,17 @@ const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
         </tbody>
       </table>
       <div className="flex justify-between mt-4">
-        <button 
-          onClick={handlePreviousPage} 
-          disabled={currentPage === 1} 
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
           className={`p-2 ${currentPage === 1 ? 'bg-gray-300' : 'bg-blue-500 text-white'} rounded hover:bg-blue-600`}
         >
           Previous
         </button>
         <span>Page {currentPage} of {totalPages}</span>
-        <button 
-          onClick={handleNextPage} 
-          disabled={currentPage === totalPages} 
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
           className={`p-2 ${currentPage === totalPages ? 'bg-gray-300' : 'bg-blue-500 text-white'} rounded hover:bg-blue-600`}
         >
           Next
