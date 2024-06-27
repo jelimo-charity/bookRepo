@@ -1,24 +1,50 @@
-import  { useReducer, useState, useEffect } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
+import axios from 'axios';
 import BookForm from './components/BookForm';
 import Books from './components/Books';
 import { bookReducer } from './components/BookReducer';
-import BooksLocale from './components/BooksLocale';
 import { Book } from './utils/Types';
-const App = () => {
-  const [books, setBooks] = BooksLocale<Book[]>('books', []);
-  const [state, dispatch] = useReducer(bookReducer, books);
+
+const App: React.FC = () => {
+  const [state, dispatch] = useReducer(bookReducer, []);
   const [currentBook, setCurrentBook] = useState<Book | null>(null);
 
   useEffect(() => {
-    setBooks(state);
-  }, [state, setBooks]);
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get('https://chachaapi.onrender.com/books');
+        dispatch({ type: 'SET_BOOKS', payload: response.data });
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    };
+    fetchBooks();
+  }, []);
 
-  const handleAddOrUpdateBook = (book: Book) => {
+  const handleAddOrUpdateBook = async (book: Book) => {
     if (currentBook) {
-      dispatch({ type: 'UPDATE_BOOK', payload: book });
-      setCurrentBook(null);
+      try {
+        await axios.put(`https://chachaapi.onrender.com/books/${book.id}`, {
+          title: book.title,
+          author: book.author,
+          year: book.year,
+        });
+        dispatch({ type: 'UPDATE_BOOK', payload: book });
+        setCurrentBook(null);
+      } catch (error) {
+        console.error('Error updating book:', error);
+      }
     } else {
-      dispatch({ type: 'ADD_BOOK', payload: book });
+      try {
+        const response = await axios.post('https://chachaapi.onrender.com/books', {
+          title: book.title,
+          author: book.author,
+          year: book.year,
+        });
+        dispatch({ type: 'ADD_BOOK', payload: { ...book, id: response.data.msg.id } });
+      } catch (error) {
+        console.error('Error adding book:', error);
+      }
     }
   };
 
@@ -26,13 +52,18 @@ const App = () => {
     setCurrentBook(book);
   };
 
-  const handleDeleteBook = (id: number) => {
-    dispatch({ type: 'DELETE_BOOK', payload: { id } as Book });
+  const handleDeleteBook = async (id: number) => {
+    try {
+      await axios.delete(`https://chachaapi.onrender.com/books/${id}`);
+      dispatch({ type: 'DELETE_BOOK', payload: { id } as Book });
+    } catch (error) {
+      console.error('Error deleting book:', error);
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 bg-gray-900 mt-16 rounded-sm">
-      <h1 className="text-2xl text-white font-bold mb-4"> Chacha Book Repository</h1>
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Book Repository</h1>
       <BookForm onSubmit={handleAddOrUpdateBook} book={currentBook} />
       <Books books={state} onEdit={handleEditBook} onDelete={handleDeleteBook} />
     </div>
