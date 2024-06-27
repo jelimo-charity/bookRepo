@@ -21,10 +21,10 @@ const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
       <tbody>
         {books.map((book) => (
           <tr key={book.id} className="text-center">
-            <td className="p-2 border">{book.title}</td>
-            <td className="p-2 border">{book.author}</td>
-            <td className="p-2 border">{book.year}</td>
-            <td className="p-2 border">
+            <td className="p-2 border text-blue-800">{book.title}</td>
+            <td className="p-2 border text-blue-800">{book.author}</td>
+            <td className="p-2 border text-blue-800">{book.year}</td>
+            <td className="p-2 border text-blue-800">
               <button
                 className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 mr-2"
                 onClick={() => onEdit(book)}
