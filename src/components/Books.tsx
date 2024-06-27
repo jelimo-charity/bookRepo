@@ -12,10 +12,10 @@ const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
     <table className="w-full bg-white shadow-lg rounded-lg mt-4">
       <thead>
         <tr className="bg-gray-200">
-          <th className="p-2 border">Title</th>
-          <th className="p-2 border">Author</th>
-          <th className="p-2 border">Year</th>
-          <th className="p-2 border">Actions</th>
+          <th className="p-2 border text-blue-800">Title</th>
+          <th className="p-2 border text-blue-800">Author</th>
+          <th className="p-2 border text-blue-800">Year</th>
+          <th className="p-2 border text-blue-800">Actions</th>
         </tr>
       </thead>
       <tbody>

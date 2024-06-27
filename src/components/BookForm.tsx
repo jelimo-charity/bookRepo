@@ -59,7 +59,7 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, book }) => {
       />
       <button
         type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="w-full p-2 bg-blue-800 text-white rounded hover:bg-blue-600"
       >
         {book ? 'Update' : 'Add'} Book
       </button>
