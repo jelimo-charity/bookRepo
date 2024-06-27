@@ -43,20 +43,18 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, book }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <input
         ref={titleRef}
-        defaultValue={book ? book.title : ''}
         placeholder="Title"
         className="w-full p-2 border border-gray-300 rounded"
       />
       <input
         ref={authorRef}
-        defaultValue={book ? book.author : ''}
         placeholder="Author"
         className="w-full p-2 border border-gray-300 rounded"
       />
       <input
         ref={yearRef}
-        defaultValue={book ? book.year.toString() : ''}
         placeholder="Year"
+        type="number"
         className="w-full p-2 border border-gray-300 rounded"
       />
       <button

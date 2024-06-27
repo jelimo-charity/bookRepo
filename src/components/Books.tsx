@@ -9,29 +9,39 @@ interface BooksProps {
 
 const Books: React.FC<BooksProps> = ({ books, onEdit, onDelete }) => {
   return (
-    <div className="space-y-4">
-      {books.map((book) => (
-        <div key={book.id} className="p-4 border border-gray-300 rounded">
-          <h2 className="text-xl font-bold">{book.title}</h2>
-          <p className="text-gray-700">{book.author}</p>
-          <p className="text-gray-500">{book.year}</p>
-          <div className="space-x-2 mt-2">
-            <button
-              onClick={() => onEdit(book)}
-              className="p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => onDelete(book.id)}
-              className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
+    <table className="w-full bg-white shadow-lg rounded-lg mt-4">
+      <thead>
+        <tr className="bg-gray-200">
+          <th className="p-2 border">Title</th>
+          <th className="p-2 border">Author</th>
+          <th className="p-2 border">Year</th>
+          <th className="p-2 border">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {books.map((book) => (
+          <tr key={book.id} className="text-center">
+            <td className="p-2 border">{book.title}</td>
+            <td className="p-2 border">{book.author}</td>
+            <td className="p-2 border">{book.year}</td>
+            <td className="p-2 border">
+              <button
+                className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 mr-2"
+                onClick={() => onEdit(book)}
+              >
+                Edit
+              </button>
+              <button
+                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                onClick={() => onDelete(book.id)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
