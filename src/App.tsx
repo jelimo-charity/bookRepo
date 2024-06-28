@@ -26,23 +26,29 @@ const App: React.FC = () => {
   }, []);
 
   const handleAddOrUpdateBook = async (book: Book) => {
-    if (currentBook) {
-      try {
+    try {
+      if (currentBook) {
+        // Update existing book
         await axios.put(`https://chachaapi.onrender.com/books/${book.id}`, book);
         dispatch({ type: 'UPDATE_BOOK', payload: book });
-        setCurrentBook(null);
-      } catch (error) {
-        console.error('Error updating book:', error);
-      }
-    } else {
-      try {
+        setCurrentBook(null); // Clear current book after update
+      } else {
+        // Add new book
         const response = await axios.post('https://chachaapi.onrender.com/books', book);
-        dispatch({ type: 'ADD_BOOK', payload: { ...book, id: response.data.msg.id } });
-      } catch (error) {
-        console.error('Error adding book:', error);
+        const newBookId = response.data.msg.id; // Adjust based on actual response structure
+        dispatch({ type: 'ADD_BOOK', payload: { ...book, id: newBookId } });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('AxiosError:', error.message);
+        console.error('Error response data:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+      } else {
+        console.error('Error:', error);
       }
     }
   };
+  
 
   const handleEditBook = (book: Book) => {
     setCurrentBook(book);
