@@ -1,21 +1,21 @@
 import { Book } from '../utils/Types';
 
-interface BookAction {
-  type: string;
-  payload: Book | Book[];
-}
+type BookAction =
+  | { type: 'SET_BOOKS'; payload: Book[] }
+  | { type: 'ADD_BOOK'; payload: Book }
+  | { type: 'UPDATE_BOOK'; payload: Book }
+  | { type: 'DELETE_BOOK'; payload: number };
 
 export const bookReducer = (state: Book[], action: BookAction): Book[] => {
   switch (action.type) {
     case 'SET_BOOKS':
-      return action.payload as Book[];
+      return action.payload;
     case 'ADD_BOOK':
-      console.log('Adding book to state:', action.payload); // Debugging log
-      return [...state, action.payload as Book];
+      return [...state, action.payload];
     case 'UPDATE_BOOK':
-      return state.map(book => (book.id === (action.payload as Book).id ? action.payload as Book : book));
+      return state.map(book => book.id === action.payload.id ? action.payload : book);
     case 'DELETE_BOOK':
-      return state.filter(book => book.id !== (action.payload as Book).id);
+      return state.filter(book => book.id !== action.payload);
     default:
       return state;
   }

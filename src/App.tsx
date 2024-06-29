@@ -4,7 +4,7 @@ import BookForm from './components/BookForm';
 import Books from './components/Books';
 import Pagination from './components/Pagination';
 import { bookReducer } from './components/BookReducer';
-import { Book } from './utils/Types';
+import { Book, NewBook } from './utils/Types';
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(bookReducer, []);
@@ -17,6 +17,7 @@ const App: React.FC = () => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get('https://chachaapi.onrender.com/books');
+        console.log('Fetched books:', response.data);
         dispatch({ type: 'SET_BOOKS', payload: response.data });
       } catch (error) {
         console.error('Error fetching books:', error);
@@ -25,30 +26,26 @@ const App: React.FC = () => {
     fetchBooks();
   }, []);
 
-  const handleAddOrUpdateBook = async (book: Book) => {
+  const handleAddOrUpdateBook = async (book: Book | NewBook) => {
     try {
       if (currentBook) {
         // Update existing book
-        await axios.put(`https://chachaapi.onrender.com/books/${book.id}`, book);
-        dispatch({ type: 'UPDATE_BOOK', payload: book });
+        console.log('Updating book:', book);
+        const updatedBook = { ...book, id: currentBook.id };
+        await axios.put(`https://chachaapi.onrender.com/books/${currentBook.id}`, updatedBook);
+        dispatch({ type: 'UPDATE_BOOK', payload: updatedBook });
         setCurrentBook(null); // Clear current book after update
       } else {
         // Add new book
+        console.log('Adding new book:', book);
         const response = await axios.post('https://chachaapi.onrender.com/books', book);
-        const newBookId = response.data.msg.id; // Adjust based on actual response structure
-        dispatch({ type: 'ADD_BOOK', payload: { ...book, id: newBookId } });
+        const newBook = { ...book, id: response.data.id };
+        dispatch({ type: 'ADD_BOOK', payload: newBook });
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('AxiosError:', error.message);
-        console.error('Error response data:', error.response?.data);
-        console.error('Error status:', error.response?.status);
-      } else {
-        console.error('Error:', error);
-      }
+    } catch (error:any) {
+      console.error('Error:', error.response ? error.response.data : error.message);
     }
   };
-  
 
   const handleEditBook = (book: Book) => {
     setCurrentBook(book);
@@ -57,7 +54,7 @@ const App: React.FC = () => {
   const handleDeleteBook = async (id: number) => {
     try {
       await axios.delete(`https://chachaapi.onrender.com/books/${id}`);
-      dispatch({ type: 'DELETE_BOOK', payload: { id } as Book });
+      dispatch({ type: 'DELETE_BOOK', payload: id }); // Use id directly in payload
     } catch (error) {
       console.error('Error deleting book:', error);
     }

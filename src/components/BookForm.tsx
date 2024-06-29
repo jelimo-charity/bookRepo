@@ -1,67 +1,79 @@
-import React, { useRef, FormEvent, useEffect } from 'react';
-import { Book } from '../utils/Types';
+import React, { useState, useEffect } from 'react';
+import { Book, NewBook } from '../utils/Types';
 
 interface BookFormProps {
-  onSubmit: (book: Book) => void;
-  book?: Book | null;
+  onSubmit: (book: Book | NewBook) => void;
+  book: Book | null;
 }
 
 const BookForm: React.FC<BookFormProps> = ({ onSubmit, book }) => {
-  const titleRef = useRef<HTMLInputElement>(null);
-  const authorRef = useRef<HTMLInputElement>(null);
-  const yearRef = useRef<HTMLInputElement>(null);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [year, setYear] = useState<number | ''>('');
 
   useEffect(() => {
     if (book) {
-      if (titleRef.current) titleRef.current.value = book.title;
-      if (authorRef.current) authorRef.current.value = book.author;
-      if (yearRef.current) yearRef.current.value = book.year.toString();
+      setTitle(book.title);
+      setAuthor(book.author);
+      setYear(book.year);
     } else {
-      if (titleRef.current) titleRef.current.value = '';
-      if (authorRef.current) authorRef.current.value = '';
-      if (yearRef.current) yearRef.current.value = '';
+      setTitle('');
+      setAuthor('');
+      setYear('');
     }
   }, [book]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newBook: Book = {
-      id: book ? book.id : Date.now(),
-      title: titleRef.current?.value || '',
-      author: authorRef.current?.value || '',
-      year: parseInt(yearRef.current?.value || '0', 10),
-    };
-    onSubmit(newBook);
-    if (!book) {
-      if (titleRef.current) titleRef.current.value = '';
-      if (authorRef.current) authorRef.current.value = '';
-      if (yearRef.current) yearRef.current.value = '';
+    if (!title || !author || !year) {
+      alert('Please fill in all fields');
+      return;
     }
+    if (typeof year === 'number' && (year < 0 || year > new Date().getFullYear())) {
+      alert('Please enter a valid year');
+      return;
+    }
+    const newBook: NewBook = { title, author, year: year as number };
+    onSubmit(newBook);
+    setTitle('');
+    setAuthor('');
+    setYear('');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        ref={titleRef}
-        placeholder="Title"
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-      <input
-        ref={authorRef}
-        placeholder="Author"
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-      <input
-        ref={yearRef}
-        placeholder="Year"
-        type="number"
-        className="w-full p-2 border border-gray-300 rounded"
-      />
+    <form onSubmit={handleSubmit} className="mb-4">
+      <div>
+        <label className="block mb-2 text-sm font-bold text-gray-700">Title</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded mb-4"
+        />
+      </div>
+      <div>
+        <label className="block mb-2 text-sm font-bold text-gray-700">Author</label>
+        <input
+          type="text"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded mb-4"
+        />
+      </div>
+      <div>
+        <label className="block mb-2 text-sm font-bold text-gray-700">Year</label>
+        <input
+          type="number"
+          value={year}
+          onChange={(e) => setYear(parseInt(e.target.value) || '')}
+          className="w-full p-2 border border-gray-300 rounded mb-4"
+        />
+      </div>
       <button
         type="submit"
-        className="w-full p-2 bg-blue-800 text-white rounded hover:bg-blue-600"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
-        {book ? 'Update' : 'Add'} Book
+        {book ? 'Update Book' : 'Add Book'}
       </button>
     </form>
   );
